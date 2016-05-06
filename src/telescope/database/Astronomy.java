@@ -3,6 +3,7 @@ package telescope.database;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 
+import telescope.Local;
 import telescope.Util;
 import telescope.database.AstronomicalObject.Type;
 import eu.cloudmakers.astronometry.NOVAS;
@@ -27,14 +30,15 @@ public class Astronomy {
 	}
 
 	public static void main(String[] args) throws UnsupportedEncodingException, IOException {
-		Astronomy astronomy = new Astronomy();
+
+        Astronomy astronomy = new Astronomy();
 		System.out.println(astronomy.astronomicalObjects.size());
 		
 		//print(astronomy);
 		
-		//export(astronomy);
+        // export(astronomy);
 		
-		DateTime day = new DateTime().withTimeAtStartOfDay();
+        DateTime day = new DateTime().withZone(DateTimeZone.UTC).withTimeAtStartOfDay();
 		
 		for(int i=0;i<100;i++) {
 			double julian = DateTimeUtils.toJulianDay(day.getMillis());
@@ -188,11 +192,13 @@ public class Astronomy {
 		starString.append("};");
 		dsoString.append("};");
 		
-		Files.write(Paths.get("D:", "projects", "arduino", "Telescope", "stars.h"), 
+        Path arduinoDir = Paths.get(Local.getOrThrow("arduino.dir"));
+
+        Files.write(arduinoDir.resolve("stars.h"),
 				starString.toString().getBytes("ASCII"), 
 				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 		
-		Files.write(Paths.get("D:", "projects", "arduino", "Telescope", "dsos.h"), 
+        Files.write(arduinoDir.resolve("dsos.h"),
 				dsoString.toString().getBytes("ASCII"), 
 				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}
