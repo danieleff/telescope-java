@@ -8,15 +8,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 
 import telescope.Local;
-import telescope.Util;
 import telescope.database.AstronomicalObject.Type;
-import eu.cloudmakers.astronometry.NOVAS;
-import eu.cloudmakers.astronometry.NOVAS.CelestialObject;
-import eu.cloudmakers.astronometry.NOVAS.DoubleRef;
 
 public class AstronomyExporter {
 
@@ -29,41 +24,13 @@ public class AstronomyExporter {
 
         exportStars(astronomy);
         exportDSOs(astronomy);
+        // exportPlanets();
 
         DateTime day = new DateTime().withZone(DateTimeZone.UTC).withTimeAtStartOfDay();
 
-        for (int i = 0; i < 100; i++) {
-            double julian = DateTimeUtils.toJulianDay(day.getMillis());
+        AstronomicalObject planet = astronomy.getPlanetPosition(Astronomy.MOON);
+        System.out.println(planet.ra + " " + planet.dec + " " + planet.distance);
 
-            // System.out.println(julian);
-
-            CelestialObject saturnus = new NOVAS.CelestialObject((short) 0, (short) 6, "Saturnus");
-            NOVAS.DoubleRef ra = new DoubleRef();
-            NOVAS.DoubleRef dec = new DoubleRef();
-            NOVAS.DoubleRef distance = new DoubleRef();
-
-            // NOVAS.PositionOnSurface pos = new NOVAS.PositionOnSurface(47.82,
-            // 20.58, 116, 20, 1018);
-            NOVAS.PositionOnSurface pos = new NOVAS.PositionOnSurface(47.82, 20.58, 0, 0, 0);
-
-            NOVAS.appPlanet(julian, saturnus, 0, ra, dec, distance);
-            // NOVAS.localPlanet(julian, saturnus, 69, pos, 0, ra, dec,
-            // distance);
-
-            NOVAS.topoPlanet(julian, saturnus, 69, pos, 0, ra, dec, distance);
-
-            System.out.print(day + "\t");
-            // System.out.print(ra.value+"\t");
-            // System.out.print(dec.value+"\t");
-
-            System.out.print(Util.raToString(ra.value) + "\t");
-            System.out.print(Util.decToString(dec.value) + "\t");
-
-            System.out.print(distance.value);
-            System.out.println();
-
-            day = day.plusDays(1);
-        }
     }
 
     private static void print(Astronomy astronomy) {

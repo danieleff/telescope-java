@@ -5,23 +5,72 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import telescope.database.AstronomicalObject.Type;
+import eu.cloudmakers.astronometry.NOVAS;
+import eu.cloudmakers.astronometry.NOVAS.CelestialObject;
+import eu.cloudmakers.astronometry.NOVAS.DoubleRef;
+import eu.cloudmakers.astronometry.NOVAS.PositionOnSurface;
+import eu.cloudmakers.astronometry.Utils;
 
 public class Astronomy {
 
+    public static final int MERCURY = 1;
+    public static final int VENUS = 2;
+    public static final int EARTH = 3;
+    public static final int MARS = 4;
+    public static final int JUPITER = 5;
+    public static final int SATURN = 6;
+    public static final int URANUS = 7;
+    public static final int NEPTUNE = 8;
+    public static final int PLUTO = 9;
+    public static final int SUN = 10;
+    public static final int MOON = 11;
+
     private List<AstronomicalObject> astronomicalObjects = new ArrayList<>();
+
+    private PositionOnSurface positionOnSurface;
 
 	public Astronomy() {
 		load();
+
+        positionOnSurface = new NOVAS.PositionOnSurface(47.82, 20.58, 0, 0, 0);
 	}
+
+    public void setPosition(double lat, double lon, double alt, double temp, double pressure) {
+
+        positionOnSurface = new NOVAS.PositionOnSurface(lat, lon, alt, temp, pressure);
+    }
 
     public List<AstronomicalObject> getAstronomicalObjects() {
         return astronomicalObjects;
     }
-	
-	private void load() {
+
+    public AstronomicalObject getPlanetPosition(int planet) {
+        return getPlanetPosition(new Date(), planet);
+    }
+
+    public AstronomicalObject getPlanetPosition(Date date, int planetId) {
+        double julian = Utils.UTC2JD(date);
+
+        CelestialObject planet = new NOVAS.CelestialObject((short) 0, (short) planetId, "");
+
+        NOVAS.DoubleRef ra = new DoubleRef();
+        NOVAS.DoubleRef dec = new DoubleRef();
+        NOVAS.DoubleRef distance = new DoubleRef();
+
+        NOVAS.topoPlanet(julian, planet, Utils.DELTA_T, positionOnSurface, 0, ra, dec, distance);
+
+        AstronomicalObject ret = new AstronomicalObject();
+        ret.ra = ra.value;
+        ret.dec = dec.value;
+        ret.distance = distance.value;
+        return ret;
+    }
+
+    private void load() {
 		try {
 			List<String> csvRows = Files.readAllLines(Paths.get("hygdata_v3.csv"));
 			for (String csvRow : csvRows) {
