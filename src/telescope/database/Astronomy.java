@@ -36,7 +36,7 @@ public class Astronomy {
 	public Astronomy() {
 		load();
 
-        positionOnSurface = new NOVAS.PositionOnSurface(47.82, 20.58, 0, 0, 0);
+        positionOnSurface = new NOVAS.PositionOnSurface(47.814381, 20.584497, 42, 20, 1000);
 	}
 
     public void setPosition(double lat, double lon, double alt, double temp, double pressure) {
@@ -64,6 +64,7 @@ public class Astronomy {
         NOVAS.topoPlanet(julian, planet, Utils.DELTA_T, positionOnSurface, 0, ra, dec, distance);
 
         AstronomicalObject ret = new AstronomicalObject();
+        ret.hip = planetId;
         ret.ra = ra.value;
         ret.dec = dec.value;
         ret.distance = distance.value;
