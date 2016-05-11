@@ -25,7 +25,7 @@ public abstract class Telescope {
 	protected synchronized void setPosition(int currentX, int currentY) {
 		this.currentX = currentX;
 		this.currentY = currentY;
-		data.update();
+		data.sendToTelescope();
 	}
 	
 	public abstract void sendData();

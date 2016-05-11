@@ -30,7 +30,7 @@ public class Data {
 		}
 	}
 
-	public void update() {
+	public void sendToTelescope() {
 		if (gui!=null) {
 			gui.setLabels();
 		}

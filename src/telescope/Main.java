@@ -1,5 +1,7 @@
 package telescope;
 
+import telescope.connection.SerialUSB;
+
 
 public class Main {
 
@@ -8,10 +10,10 @@ public class Main {
 
 		//new Ps3Controller(data);
 		
-		//SerialUSB telescope = new SerialUSB(data);
-		//data.setTelescope(telescope);
+		SerialUSB telescope = new SerialUSB(data);
+		data.setTelescope(telescope);
 		
-		GUI gui = new GUI(data);
+		GUI gui = new GUI(data, telescope);
 		data.setGui(gui);
 		
 	}

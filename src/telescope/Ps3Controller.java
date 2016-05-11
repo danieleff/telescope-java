@@ -44,7 +44,7 @@ public class Ps3Controller {
 					changed=true;
 				}
 				if (changed) {
-					data.update();
+					data.sendToTelescope();
 				}
 			}
 			

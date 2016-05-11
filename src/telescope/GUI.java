@@ -1,5 +1,7 @@
 package telescope;
 
+import gnu.io.CommPortIdentifier;
+
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Component;
@@ -16,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -25,7 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import telescope.database.Astronomy;
+import telescope.connection.SerialUSB;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -52,9 +55,24 @@ public class GUI implements ItemListener {
 	private JComboBox<Object> telescopeCombobox;
 
 	private Button gotoButton;
+
+	private Button refreshButton;
+
+	private SerialUSB usbTelescope;
 	
-	public GUI(final Data data) {
+	public GUI(final Data data, SerialUSB usbTelescope) {
 		this.data = data;
+		this.usbTelescope = usbTelescope;
+
+		telescopeCombobox = new JComboBox<>();
+		telescopeCombobox.addItemListener(this);
+		
+		refreshButton = new Button("Refresh ports");
+		refreshButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshCom();
+			}
+		});
 		
 		currentXLabel = new JLabel();
 		currentYLabel = new JLabel();
@@ -75,17 +93,9 @@ public class GUI implements ItemListener {
 				data.getTelescope().close();
 			};
 		});
-
-		telescopeCombobox = new JComboBox<>();
-		telescopeCombobox.addItem("Dummy");
-		telescopeCombobox.setMaximumSize(telescopeCombobox.getPreferredSize());
-		telescopeCombobox.addItemListener(this);
 		
 		JPanel panel = new JPanel();
 		
-		//BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		//panel.setLayout(layout);
-        
 		GridBagLayout layout = new GridBagLayout();
 		
 		panel.setLayout(layout);
@@ -95,6 +105,9 @@ public class GUI implements ItemListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(5, 5, 5, 5);
+        
+        panel.add(refreshButton, gbc);
+        panel.add(telescopeCombobox, gbc);
         
 		panel.add(currentXLabel, gbc);
 		panel.add(currentYLabel, gbc);
@@ -190,21 +203,34 @@ public class GUI implements ItemListener {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
+		refreshCom();
+	}
+
+	private void refreshCom() {
+		telescopeCombobox.removeAllItems();
+		telescopeCombobox.addItem(null);
+		
+		Enumeration<CommPortIdentifier> comPorts = usbTelescope.getComPorts();
+		while (comPorts.hasMoreElements()) {
+			CommPortIdentifier comPort = comPorts.nextElement();
+			if (comPort.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+				telescopeCombobox.addItem(comPort.getName());						
+			}
+		}
 	}
 	
 	public void gotoClicked(ActionEvent event) {
 		try {
 			data.setGotoX(Integer.parseInt(gotoXField.getText()));
 			data.setGotoY(Integer.parseInt(gotoYField.getText()));
+			
+			data.sendToTelescope();
+			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public JComboBox<Object> getTelescopeCombobox() {
-		return telescopeCombobox;
-	}
-
 	public void setLabels() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -225,7 +251,16 @@ public class GUI implements ItemListener {
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		//TODO dummy/USB
+		usbTelescope.disconnect();
+		
+		String selectedComPort = (String) e.getItem();
+		if (selectedComPort!=null) {
+			try {
+				usbTelescope.connect(selectedComPort);
+			} catch (Exception e1) {
+				throw new Error(e1);
+			}
+		}
 	}
 	
 }
