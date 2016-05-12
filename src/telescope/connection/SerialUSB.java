@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-import telescope.Data;
-
 public class SerialUSB extends Telescope {
 
 	private SerialPort serialPort;
@@ -19,8 +17,8 @@ public class SerialUSB extends Telescope {
 
 	private InputStream inputStream;
 	
-	public SerialUSB(Data data) throws Exception {
-		super(data);
+	public SerialUSB() throws Exception {
+		super();
 	}
 	
 	public void connect(String port) throws Exception {
@@ -63,9 +61,15 @@ public class SerialUSB extends Telescope {
 				if (r.ready()) {
 					String line = r.readLine();
 					System.out.println("Got: " + line);
-					
-					//String[] split = line.split(" ");
-					//setPosition(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+					if (line.startsWith("Pos ")) {
+						String[] split = line.split(" ");
+						
+						try{
+							setPosition(Float.parseFloat(split[1]), Float.parseFloat(split[2]));
+						} catch(Exception e) {
+							e.printStackTrace();
+						}
+					}
 				} else {
 					Thread.sleep(10);
 				}
@@ -78,7 +82,7 @@ public class SerialUSB extends Telescope {
 
 	@Override
 	public void sendData() {
-		String string = "Move "+data.getGotoX()+" "+data.getGotoY()+"\n";
+		String string = "Move "+getGotoRa()+" "+getGotoDec()+"\n";
 		
 		System.out.println(string);
 		

@@ -46,11 +46,9 @@ public class GUI implements ItemListener {
 
 	private JLabel currentYLabel;
 
-	private JTextField gotoXField;
+	private JTextField gotoRaField;
 
-	private JTextField gotoYField;
-
-	private Data data;
+	private JTextField gotoDecField;
 
 	private JComboBox<Object> telescopeCombobox;
 
@@ -58,11 +56,10 @@ public class GUI implements ItemListener {
 
 	private Button refreshButton;
 
-	private SerialUSB usbTelescope;
+	private SerialUSB telescope;
 	
-	public GUI(final Data data, SerialUSB usbTelescope) {
-		this.data = data;
-		this.usbTelescope = usbTelescope;
+	public GUI(SerialUSB telescope) {
+		this.telescope = telescope;
 
 		telescopeCombobox = new JComboBox<>();
 		telescopeCombobox.addItemListener(this);
@@ -76,8 +73,8 @@ public class GUI implements ItemListener {
 		
 		currentXLabel = new JLabel();
 		currentYLabel = new JLabel();
-		gotoXField = new JTextField();
-		gotoYField = new JTextField();
+		gotoRaField = new JTextField();
+		gotoDecField = new JTextField();
 		gotoButton = new Button("GOTO");
 		
 		gotoButton.addActionListener(new ActionListener() {
@@ -90,7 +87,7 @@ public class GUI implements ItemListener {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				data.getTelescope().close();
+				telescope.close();
 			};
 		});
 		
@@ -111,16 +108,16 @@ public class GUI implements ItemListener {
         
 		panel.add(currentXLabel, gbc);
 		panel.add(currentYLabel, gbc);
-		panel.add(gotoXField, gbc);
-		panel.add(gotoYField, gbc);
+		panel.add(gotoRaField, gbc);
+		panel.add(gotoDecField, gbc);
 		panel.add(gotoButton, gbc);
 		
 		gbc.weighty = 1;
 		panel.add(Box.createVerticalGlue(), gbc);
 		panel.setMinimumSize(new Dimension(500, 0));
 		
-		gotoXField.setAlignmentX(Component.CENTER_ALIGNMENT);
-		gotoYField.setAlignmentX(Component.CENTER_ALIGNMENT);
+		gotoRaField.setAlignmentX(Component.CENTER_ALIGNMENT);
+		gotoDecField.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		
 		frame.add(panel, BorderLayout.WEST);
@@ -210,7 +207,7 @@ public class GUI implements ItemListener {
 		telescopeCombobox.removeAllItems();
 		telescopeCombobox.addItem(null);
 		
-		Enumeration<CommPortIdentifier> comPorts = usbTelescope.getComPorts();
+		Enumeration<CommPortIdentifier> comPorts = telescope.getComPorts();
 		while (comPorts.hasMoreElements()) {
 			CommPortIdentifier comPort = comPorts.nextElement();
 			if (comPort.getPortType() == CommPortIdentifier.PORT_SERIAL) {
@@ -221,10 +218,9 @@ public class GUI implements ItemListener {
 	
 	public void gotoClicked(ActionEvent event) {
 		try {
-			data.setGotoX(Integer.parseInt(gotoXField.getText()));
-			data.setGotoY(Integer.parseInt(gotoYField.getText()));
+			telescope.setGoto(Float.parseFloat(gotoRaField.getText()), Float.parseFloat(gotoDecField.getText()));
 			
-			data.sendToTelescope();
+			telescope.sendData();
 			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -234,29 +230,29 @@ public class GUI implements ItemListener {
 	public void setLabels() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				currentXLabel.setText("Current X: " + data.getTelescope().getCurrentX());
-				currentYLabel.setText("Current Y: " + data.getTelescope().getCurrentY());					
+				currentXLabel.setText("Ra : " + telescope.getRa());
+				currentYLabel.setText("Dec: " + telescope.getDec());					
 			}
 		});
 	}
 	
 	public void setGotoLabels() {
-		if (!(""+data.getGotoX()).equals(gotoXField.getText())) {
-			gotoXField.setText(""+data.getGotoX());
+		if (!(""+telescope.getGotoRa()).equals(gotoRaField.getText())) {
+			gotoRaField.setText(""+telescope.getGotoRa());
 		}
-		if (!(""+data.getGotoY()).equals(gotoYField.getText())) {
-			gotoYField.setText(""+data.getGotoY());
+		if (!(""+telescope.getGotoDec()).equals(gotoDecField.getText())) {
+			gotoDecField.setText(""+telescope.getGotoDec());
 		}
 	}
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		usbTelescope.disconnect();
+		telescope.disconnect();
 		
 		String selectedComPort = (String) e.getItem();
 		if (selectedComPort!=null) {
 			try {
-				usbTelescope.connect(selectedComPort);
+				telescope.connect(selectedComPort);
 			} catch (Exception e1) {
 				throw new Error(e1);
 			}

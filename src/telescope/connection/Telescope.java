@@ -1,31 +1,40 @@
 package telescope.connection;
 
-import telescope.Data;
 
 public abstract class Telescope {
 
-	private int currentX;
+	private float ra;
 	
-	private int currentY;
+	private float dec;
 
-	protected final Data data;
+	private float gotoRa;
 	
-	public Telescope(Data data) {
-		this.data = data;
+	private float gotoDec ;
+	
+	public synchronized float getRa() {
+		return ra;
 	}
 	
-	public synchronized int getCurrentX() {
-		return currentX;
+	public synchronized float getDec() {
+		return dec;
 	}
 	
-	public synchronized int getCurrentY() {
-		return currentY;
+	public synchronized float getGotoRa() {
+		return gotoRa;
 	}
 	
-	protected synchronized void setPosition(int currentX, int currentY) {
-		this.currentX = currentX;
-		this.currentY = currentY;
-		data.sendToTelescope();
+	public synchronized float getGotoDec() {
+		return gotoDec;
+	}
+
+	public void setGoto(float gotoRa, float gotoDec) {
+		this.gotoRa = gotoRa;
+		this.gotoDec = gotoDec;
+	}
+	
+	protected synchronized void setPosition(float ra, float dec) {
+		this.ra = ra;
+		this.dec = dec;
 	}
 	
 	public abstract void sendData();

@@ -3,15 +3,16 @@ package telescope;
 import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import telescope.connection.Telescope;
 
 public class Ps3Controller {
 
 	private Controller controller;
 	
-	private Data data;
+	private Telescope telescope;
 
-	public Ps3Controller(Data data) {
-		this.data = data;
+	public Ps3Controller(Telescope telescope) {
+		this.telescope = telescope;
 		
 		ControllerEnvironment e = ControllerEnvironment.getDefaultEnvironment();
 		for (Controller c : e.getControllers()) {
@@ -36,15 +37,16 @@ public class Ps3Controller {
 				float deltaY = controller.getComponent(Identifier.Axis.Y).getPollData();
 				boolean changed = false;
 				if (Math.abs(deltaX) > 0.3f) {
-					data.setGotoX((int) (data.getGotoX() + deltaX * 40));
+					telescope.setGoto((int) (telescope.getGotoRa() + deltaX * 40), telescope.getGotoDec());
 					changed=true;
 				}
 				if (Math.abs(deltaY) > 0.3f) {
-					data.setGotoY((int) (data.getGotoY() + deltaY * 40));
+					telescope.setGoto(telescope.getGotoRa(), ((int)telescope.getGotoDec() + deltaY * 40));
 					changed=true;
 				}
+				
 				if (changed) {
-					data.sendToTelescope();
+					telescope.sendData();
 				}
 			}
 			

@@ -1,13 +1,11 @@
 package telescope.connection;
 
-import telescope.Data;
 
 public class Dummy extends Telescope {
 
 	private Thread thread;
 	
-	public Dummy(Data data) {
-		super(data);
+	public Dummy() {
 		
 		thread = new Thread(new Runnable() {
 			public void run() {
@@ -20,17 +18,17 @@ public class Dummy extends Telescope {
 	private void doInBackground() {
 		while(!Thread.currentThread().isInterrupted()) {
 			
-			int x=getCurrentX();
-			if (x<data.getGotoX()) {
-				x++;
-			} else if (x>data.getGotoX()) {
-				x--;
+			float x=getRa();
+			if (x<getGotoRa()) {
+				x+=0.1;
+			} else if (x>getGotoRa()) {
+				x-=0.1;
 			}
-			int y = getCurrentY();
-			if (y<data.getGotoY()) {
-				y++;
-			} else if (y>data.getGotoY()) {
-				y--;
+			float y = getDec();
+			if (y<getGotoDec()) {
+				y+=0.1;
+			} else if (y>getGotoDec()) {
+				y-=0.1;
 			}
 			
 			setPosition(x, y);

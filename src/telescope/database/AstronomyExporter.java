@@ -145,11 +145,11 @@ public class AstronomyExporter {
         
         for (AstronomicalObject planet : planets) {
         	
-        	int times = 30;
+        	int times = 10;
         	int deltaHours = 24;
         	if (planet == moon) {
         		deltaHours = 1;
-        		times = 30 * 24;
+        		times = 10 * 24;
         	}
         	
         	meta += times + ", " + deltaHours + ", " + timesSum + ", ";
