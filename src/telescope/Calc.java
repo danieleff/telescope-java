@@ -7,62 +7,97 @@ public class Calc {
 		//http://www.geocities.jp/toshimi_taki/aim/aim.htm
 		
 		int time1 = 1023;
-        float telescope1Ra = 40.5f; // Altitude Telescope
-        float telescope1Dec = 341.1f; // Azimuth Telescope
-        float real1Ra = 5.25f * 15; // Real
-        float real1Dec = 46f; // Real
+        float telescope1Ra = 40.5f;
+        float telescope1Dec = 341.1f;
+        float real1Ra = 5.25f * 15;
+        float real1Dec = 46f;
+        //float real1Ra = 40.5f;
+        //float real1Dec = 341.1f;
 
-        System.out.println(Math.cos(Math.toRadians(real1Dec)) * Math.cos(Math.toRadians(6.7f * 15 - real1Ra)));
-        System.out.println(Math.sin(Math.toRadians(telescope1Ra)));
-		
 		int time2 = 1023;
-        float relescope2Ra = 175.6f;
-        float telescope2Dec = 73.25f;
+        float telescope2Ra = 73.25f;
+        float telescope2Dec = 175.6f;
         float real2Ra = 6.75f * 15;
         float real2Dec = -16.75f;
-		
+        //float real2Ra = 73.25f;
+        //float real2Dec = 175.6f;
+
         telescope1Ra = (float) Math.toRadians(telescope1Ra);
         telescope1Dec = (float) Math.toRadians(telescope1Dec);
         real1Ra = (float) Math.toRadians(real1Ra);
         real1Dec = (float) Math.toRadians(real1Dec);
 
-        relescope2Ra = (float) Math.toRadians(relescope2Ra);
+        telescope2Ra = (float) Math.toRadians(telescope2Ra);
         telescope2Dec = (float) Math.toRadians(telescope2Dec);
         real2Ra = (float) Math.toRadians(real2Ra);
         real2Dec = (float) Math.toRadians(real2Dec);
 
-		float [][] lmn = new float[3][3];
+        //System.out.println(Math.cos(real1Dec) * Math.cos(real1Ra));
+        //System.out.println(Math.sin(telescope1Ra));
+		
+        //System.out.println(Math.cos(real2Dec) * Math.cos(real2Ra));
+        //System.out.println(Math.sin(telescope2Ra));
+		
+		float [][] lmn = lmn(telescope1Ra, telescope1Dec, telescope2Ra, telescope2Dec);
+		float [][] LMN = lmn(real1Ra, real1Dec, real2Ra, real2Dec);
+		
+		LMN = inverse(LMN);
+		
+		float[][] t=new float[3][3];
+
+		for(int i=0;i<=2;i++) {
+			for(int j=0;j<=2;j++) {
+				t[i][j] = lmn[0][j] * LMN[i][0] + lmn[1][j] * LMN[i][1] + lmn[2][j] * LMN[i][2];
+			}
+		}
+		
+		System.out.println("lmn");
+		
+		System.out.println(lmn[0][0] + "\t" + lmn[1][0] + "\t" + lmn[2][0]);
+		System.out.println(lmn[0][1] + "\t" + lmn[1][1] + "\t" + lmn[2][1]);
+		System.out.println(lmn[0][2] + "\t" + lmn[1][2] + "\t" + lmn[2][2]);
+		
+		System.out.println("LMN");
+		
+		System.out.println(LMN[0][0] + "\t" + LMN[1][0] + "\t" + LMN[2][0]);
+		System.out.println(LMN[0][1] + "\t" + LMN[1][1] + "\t" + LMN[2][1]);
+		System.out.println(LMN[0][2] + "\t" + LMN[1][2] + "\t" + LMN[2][2]);
+		
+		System.out.println("T");
+		
+		System.out.println(t[0][0] + "\t" + t[1][0] + "\t" + t[2][0]);
+		System.out.println(t[0][1] + "\t" + t[1][1] + "\t" + t[2][1]);
+		System.out.println(t[0][2] + "\t" + t[1][2] + "\t" + t[2][2]);
+
+		t = inverse(t);
+		System.out.println("Inverse T");
+		System.out.println(t[0][0] + "\t" + t[1][0] + "\t" + t[2][0]);
+		System.out.println(t[0][1] + "\t" + t[1][1] + "\t" + t[2][1]);
+		System.out.println(t[0][2] + "\t" + t[1][2] + "\t" + t[2][2]);
+		
+        System.out.println();
+
+        System.out.println(Math.sin(telescope1Dec));
+        
+        float L = (float) (Math.cos(real1Dec) * Math.cos(real1Ra));
+        float M = (float) (Math.cos(real1Dec) * Math.sin(real1Ra));
+        float N = (float) (Math.sin(real1Dec));
+        
+        float x = t[0][2] * L + t[1][2] * M + t[2][2] * N;
+        
+        System.out.println(x);
+	}
+	
+	private static float[][] lmn(float ra1, float dec1, float ra2, float dec2) {
 		float [][] LMN = new float[3][3];
 		
-        lmn[0][0] = (float) (Math.cos(telescope1Dec) * Math.cos(telescope1Ra));
-        lmn[0][1] = (float) (Math.cos(telescope1Dec) * Math.sin(telescope1Ra));
-        lmn[0][2] = (float) (Math.sin(telescope1Dec));
+        LMN[0][0] = (float) (Math.cos(dec1) * Math.cos(ra1));
+        LMN[0][1] = (float) (Math.cos(dec1) * Math.sin(ra1));
+        LMN[0][2] = (float) (Math.sin(dec1));
 		
-        LMN[0][0] = (float) (Math.cos(real1Dec) * Math.cos(real1Ra));
-        LMN[0][1] = (float) (Math.cos(real1Dec) * Math.sin(real1Ra));
-        LMN[0][2] = (float) (Math.sin(real1Dec));
-		
-        lmn[1][0] = (float) (Math.cos(telescope2Dec) * Math.cos(relescope2Ra));
-        lmn[1][1] = (float) (Math.cos(telescope2Dec) * Math.sin(relescope2Ra));
-        lmn[1][2] = (float) (Math.sin(telescope2Dec));
-		
-        LMN[1][0] = (float) (Math.cos(real2Dec) * Math.cos(real2Ra));
-        LMN[1][1] = (float) (Math.cos(real2Dec) * Math.sin(real2Ra));
-        LMN[1][2] = (float) (Math.sin(real2Dec));
-		
-		float a = (float) (1 / 
-				Math.sqrt(
-						(lmn[0][1]*lmn[1][2]-lmn[0][2]*lmn[1][1]) * (lmn[0][1]*lmn[1][2]-lmn[0][2]*lmn[1][1])
-						+
-						(lmn[0][2]*lmn[1][0]-lmn[0][0]*lmn[1][2]) * (lmn[0][2]*lmn[1][0]-lmn[0][0]*lmn[1][2])
-						+
-						(lmn[0][0]*lmn[1][1]-lmn[0][1]*lmn[1][0]) * (lmn[0][0]*lmn[1][1]-lmn[0][1]*lmn[1][0])
-						)
-				);
-		
-		lmn[2][0] = a * (lmn[0][1]*lmn[1][2]-lmn[0][2]*lmn[1][1]);
-		lmn[2][1] = a * (lmn[0][2]*lmn[1][0]-lmn[0][0]*lmn[1][2]);
-		lmn[2][2] = a * (lmn[0][0]*lmn[1][1]-lmn[0][1]*lmn[1][0]);
+        LMN[1][0] = (float) (Math.cos(dec2) * Math.cos(ra2));
+        LMN[1][1] = (float) (Math.cos(dec2) * Math.sin(ra2));
+        LMN[1][2] = (float) (Math.sin(dec2));
 		
 		float b = (float) (1 / 
 				Math.sqrt(
@@ -77,42 +112,7 @@ public class Calc {
 		LMN[2][0] = b * (LMN[0][1]*LMN[1][2]-LMN[0][2]*LMN[1][1]);
 		LMN[2][1] = b * (LMN[0][2]*LMN[1][0]-LMN[0][0]*LMN[1][2]);
 		LMN[2][2] = b * (LMN[0][0]*LMN[1][1]-LMN[0][1]*LMN[1][0]);
-
-		LMN = inverse(LMN);
-		
-		float[][] t=new float[3][3];
-
-		t[0][0] = lmn[0][0] * LMN[0][0] + lmn[1][0] * LMN[0][1] + lmn[2][0] * LMN[0][2];
-		t[0][1] = lmn[0][1] * LMN[0][0] + lmn[1][1] * LMN[0][1] + lmn[2][1] * LMN[0][2];
-		t[0][2] = lmn[0][2] * LMN[0][0] + lmn[1][2] * LMN[0][1] + lmn[2][2] * LMN[0][2];
-		
-		t[1][0] = lmn[0][0] * LMN[1][0] + lmn[1][0] * LMN[1][1] + lmn[2][0] * LMN[1][2];
-		t[1][1] = lmn[0][1] * LMN[1][0] + lmn[1][1] * LMN[1][1] + lmn[2][1] * LMN[1][2];
-		t[1][2] = lmn[0][2] * LMN[1][0] + lmn[1][2] * LMN[1][1] + lmn[2][2] * LMN[1][2];
-		
-		t[2][0] = lmn[0][0] * LMN[2][0] + lmn[1][0] * LMN[2][1] + lmn[2][0] * LMN[2][2];
-		t[2][1] = lmn[0][1] * LMN[2][0] + lmn[1][1] * LMN[2][1] + lmn[2][1] * LMN[2][2];
-		t[2][2] = lmn[0][2] * LMN[2][0] + lmn[1][2] * LMN[2][1] + lmn[2][2] * LMN[2][2];
-		
-		System.out.println(lmn[0][0] + "\t" + lmn[1][0] + "\t" + lmn[2][0]);
-		System.out.println(lmn[0][1] + "\t" + lmn[1][1] + "\t" + lmn[2][1]);
-		System.out.println(lmn[0][2] + "\t" + lmn[1][2] + "\t" + lmn[2][2]);
-		
-		System.out.println();
-		
-		System.out.println(LMN[0][0] + "\t" + LMN[1][0] + "\t" + LMN[2][0]);
-		System.out.println(LMN[0][1] + "\t" + LMN[1][1] + "\t" + LMN[2][1]);
-		System.out.println(LMN[0][2] + "\t" + LMN[1][2] + "\t" + LMN[2][2]);
-		
-		System.out.println();
-		
-		System.out.println(t[0][0] + "\t" + t[1][0] + "\t" + t[2][0]);
-		System.out.println(t[0][1] + "\t" + t[1][1] + "\t" + t[2][1]);
-		System.out.println(t[0][2] + "\t" + t[1][2] + "\t" + t[2][2]);
-
-        System.out.println();
-
-        System.out.println(Math.sin(real1Ra));
+		return LMN;
 	}
 
 	private static float[][] inverse(float[][] m) {
