@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import telescope.coordinate.Angle;
+import telescope.coordinate.Declination;
+import telescope.coordinate.RightAscension;
 import telescope.database.AstronomicalObject.Type;
 import eu.cloudmakers.astronometry.NOVAS;
 import eu.cloudmakers.astronometry.NOVAS.CelestialObject;
@@ -65,8 +68,8 @@ public class Astronomy {
 
         AstronomicalObject ret = new AstronomicalObject();
         ret.hip = planetId;
-        ret.ra = ra.value;
-        ret.dec = dec.value;
+        ret.ra = new RightAscension(ra.value, Angle.Type.HOUR_MINUTE_SECOND);
+        ret.dec = new Declination(ra.value, Angle.Type.DEGREES);
         ret.distance = distance.value;
         return ret;
     }
@@ -94,8 +97,8 @@ public class Astronomy {
 				
 				object.name = parseStringOrNull(split[6]);
 				
-				object.ra = parseDoubleOrNull(split[7]);
-				object.dec = parseDoubleOrNull(split[8]);
+				object.ra = new RightAscension(parseDoubleOrNull(split[7]), Angle.Type.HOUR_MINUTE_SECOND);
+				object.dec = new Declination(parseDoubleOrNull(split[8]), Angle.Type.DEGREES);
 				
 				object.distance= parseDoubleOrNull(split[9]);
 				
@@ -124,8 +127,8 @@ public class Astronomy {
 
 				AstronomicalObject object = new AstronomicalObject();
 				
-				object.ra = parseDoubleOrNull(split[0]);
-				object.dec = parseDoubleOrNull(split[1]);
+				object.ra = new RightAscension(parseDoubleOrNull(split[0]), Angle.Type.HOUR_MINUTE_SECOND);
+				object.dec = new Declination(parseDoubleOrNull(split[1]), Angle.Type.DEGREES);
 				
 				object.type = Type.DSO; //TODO split[2]
 				

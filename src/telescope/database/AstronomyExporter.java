@@ -42,14 +42,14 @@ public class AstronomyExporter {
         
         AstronomicalObject middle = astronomy.getPlanetPosition(now.plusHours(12).toDate(), planetId);
 
-        float ra = (float) ((start.ra + end.ra) / 2);
-        float dec = (float) ((start.dec + end.dec) / 2);
+        float ra = (float) ((start.ra.getHourMinuteSecond() + end.ra.getHourMinuteSecond()) / 2);
+        float dec = (float) ((start.dec.getDegrees() + end.dec.getDegrees()) / 2);
         float dist = (float) ((start.distance+ end.distance) / 2);
         
         System.out.println(now);
         System.out.println(now.plusHours(12));
         System.out.println(now.plusHours(24));
-        
+        /*
         System.out.println("Start     :" + Util.raToString(start.ra) + "\t" + Util.decToString(start.dec) + "\t" + start.distance);
         System.out.println("Start     :" + start.ra + "\t" + start.dec + "\t" + start.distance);
         
@@ -73,7 +73,7 @@ public class AstronomyExporter {
         AstronomicalObject x = astronomy.getPlanetPosition(Astronomy.MOON);
         System.out.println("Real      :" + x.ra + "\t" + x.dec + "\t" + x.distance);
         System.out.println("Real      :" + Util.raToString(x.ra) + "\t" + Util.decToString(x.dec) + "\t" + x.distance);
-        
+        */
         System.out.println(Utils.UTC2JD(new DateTime().toDate()) - 2451545.0);
         
         {
@@ -160,7 +160,7 @@ public class AstronomyExporter {
         		DateTime calculatedTime = start.plusHours(deltaHours * i);
         		
                 AstronomicalObject planetTime = astronomy.getPlanetPosition(calculatedTime.toDate(), planet.hip);
-                starString.append("    {"+planetTime.ra+", "+planetTime.dec+"},\n");        		
+                starString.append("    {"+planetTime.ra.getHourMinuteSecond()+", "+planetTime.dec.getDegrees()+"},\n");        		
         	}
         	   	
         }
@@ -241,9 +241,9 @@ public class AstronomyExporter {
 
     private static void append(StringBuilder string, AstronomicalObject obj) {
         string.append("{");
-        string.append(String.format("%12f", obj.ra));
+        string.append(String.format("%12f", obj.ra.getHourMinuteSecond()));
         string.append(",");
-        string.append(String.format("%12f", obj.dec));
+        string.append(String.format("%12f", obj.dec.getDegrees()));
         string.append(",");
         String name = obj.getName();
         for (int i = 0; i < Math.min(9, name.length()); i++) {

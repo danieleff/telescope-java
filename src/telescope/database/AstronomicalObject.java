@@ -1,7 +1,7 @@
 package telescope.database;
 
-import eu.cloudmakers.astronometry.NOVAS;
-import eu.cloudmakers.astronometry.Utils;
+import telescope.coordinate.Declination;
+import telescope.coordinate.RightAscension;
 
 
 public class AstronomicalObject implements Comparable<AstronomicalObject>{
@@ -16,8 +16,9 @@ public class AstronomicalObject implements Comparable<AstronomicalObject>{
 	
 	public String name;
 	
-	public Double ra; // Right ascension - in 2000 
-	public Double dec;// Declination - in 2000
+	public RightAscension ra; // Right ascension - in 2000 
+	
+	public Declination dec;// Declination - in 2000
 	
 	public Double distance; //The star's distance in parsecs
 	
